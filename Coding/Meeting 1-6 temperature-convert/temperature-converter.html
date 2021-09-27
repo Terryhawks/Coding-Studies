@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Timedoor Temperature Converter</title>
+    <link rel="shortcut icon" href="icon.ico" />
+</head>
+
+<style>
+@import url('./base.css');
+@import url('./CSS_Codes.css');
+</style>
+
+<body>
+    <h1>Thermometer Converter</h1>
+    <button onclick="convertTemp()">Click to convert</button>
+    <h1> </h1>
+
+    <div class = "thermal-grid">
+        <div class="card" style="background-image:url('img/thermo.jpg')">
+            <h2>Termometer <br> Celcius</h2>
+            <input type="text" id="Celcius" class="Celcius"> 
+        </div>
+        
+        <div class="card" style="background-image:url('img/thermo.jpg')">
+            <h2>Termometer <br> Kelvin</h2>
+            <input type="text" id="Kelvin" class="Kelvin">
+        </div>
+    
+        <div class="card" style="background-image:url('img/thermo.jpg')">
+            <h2>Termometer <br> Fahrenheit</h2>
+            <input type="text" id="Fahrenheit" class="Fahrenheit">
+        </div>
+    </div>
+</body>
+
+<script>
+    function convertTemp() {
+        var celcius = document.getElementById("Celcius");
+        var fahrenheit = document.getElementById("Fahrenheit")
+        var kelvin = document.getElementById("Kelvin")
+
+        var celc = parseFloat(celcius.value);
+        var fahr = parseFloat(fahrenheit.value);
+        var kelv = parseFloat(kelvin.value)
+
+        var convert;
+        //Conditionals
+        if (isNaN(celc) && isNaN(fahr) && isNaN(kelv)){
+            return alert ("Fill it With Numbers. Not Words. Not [Empty] Either.")
+        }
+        else if (isNaN(celc) || isNaN(fahr) || isNaN(kelv)){
+            if (isNaN(celc) && isNaN (kelv)){
+                convert = (4*(fahr-32))/9;
+                kelvin.value = convert;
+                convert = (5*(fahr-32))/9;
+                return celcius.value = convert;
+            }
+            if (isNaN(fahr) && isNaN(kelv)){
+                convert = (celc*4)/5;
+                kelvin.value = convert;
+                convert = ((9*celc)/5)+32;
+                return fahrenheit.value = convert;
+            }
+            if (isNaN(celc) && isNaN(fahr)){
+                convert = (kelv*5)/4
+                celcius.value = convert
+                convert = ((9*kelv)/4)+32;
+                return fahrenheit.value = convert;
+            }
+        }
+        else {
+            alert ("Fill In Just One. We only need one data.")
+            celcius.value = '';
+            fahrenheit.value = '';
+            kelvin.value = '';
+            return;
+        }
+    }
+</script>
+</html>
