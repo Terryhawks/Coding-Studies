@@ -8,7 +8,7 @@
 .main-container{
    width: 100%;
    height: 100vh;
-   background: #fff;
+   background: #353535;
    display: flex;
    justify-content: center;
    align-items: center;
@@ -17,7 +17,7 @@
 .main-box{
    width: 400px;
    height: 400px;
-   background: #ffe0bd;
+   background: rgba(2, 8, 20, 0.1);
    display: flex;
    flex-direction: column;
    align-items: center;
@@ -34,7 +34,7 @@
    display: flex;
    justify-content: center;
    align-items: center;
-   color: #fff;
+   color: #fec66d;
    font-size: 18px;
    font-weight: 500;
 }
@@ -53,18 +53,19 @@
    padding: 0px 10px;
    text-align: center;
    border: none;
-   background: #fff;
-   box-shadow: 1px 1px 0px #999,
-   2px 2px 0px #999,
-   3px 2px 0px #999,
-   4px 4px 0px #999,
-   5px 5px 0px #999;
+   background: #d98b49;
+   box-shadow: 1px 1px 0px #e29955,
+   2px 2px 0px #e29955,
+   3px 2px 0px #e29955,
+   4px 4px 0px #e29955,
+   5px 5px 0px #e29955;
 }
 
 .add-s{
    margin: 13px 20px 12px 21px;
    font-size: 25px;
-  
+   border: #da8745;
+   border-width: 2px;
 }
 
 #intext2{
@@ -90,12 +91,12 @@
    border: none;
    font-size: 16px;
    color: black;
-   background: white;
-   box-shadow: 1px 1px 0px #999,
-   2px 2px 0px #999,
-   3px 2px 0px #999,
-   4px 4px 0px #999,
-   5px 5px 0px #999;
+   background: #fef3de;
+   box-shadow: 1px 1px 0px #e29955,
+   2px 2px 0px #e29955,
+   3px 2px 0px #e29955,
+   4px 4px 0px #e29955,
+   5px 5px 0px #e29955;
    border-bottom-left-radius: 10px;
    border-bottom-right-radius: 10px;
 
