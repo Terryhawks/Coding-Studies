@@ -7,3 +7,6 @@
 [submodule "jquery-color"]
 	path = jquery-color
 	url = https://github.com/jquery/jquery-color.git
+[submodule "fabric.js"]
+	path = fabric.js
+	url = https://github.com/fabricjs/fabric.js.git
