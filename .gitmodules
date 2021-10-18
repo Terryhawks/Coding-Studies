@@ -10,3 +10,6 @@
 [submodule "fabric.js"]
 	path = fabric.js
 	url = https://github.com/fabricjs/fabric.js.git
+[submodule "phaser"]
+	path = phaser
+	url = https://github.com/photonstorm/phaser.git
