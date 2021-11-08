@@ -1,0 +1,19 @@
+html{
+    background-color: #847d75;
+}
+
+canvas{
+    background-color: #A8E40A;
+    border: 2.5px solid #6EAE00;
+}
+
+h1, p {
+    text-align: center;
+    font-family: "Comic Sans MS", cursive;
+}
+
+.centering {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
