@@ -19,7 +19,7 @@ export default class BunnyJumpScene extends Phaser.Scene
 
     create()
     {
-        this.add.image(240, 320, "background");
+        this.add.image(240, 320, "background").setScrollFactor(1, 0);
         this.platforms = this.physics.add.staticGroup();
         for (let i = 0; i < 10; i++) {
             const x = Phaser.Math.Between(80, 400);
@@ -36,6 +36,7 @@ export default class BunnyJumpScene extends Phaser.Scene
         this.player.body.checkCollision.left = false
         this.player.body.checkCollision.right = false
         this.cameras.main.startFollow(this.player)
+        this.cameras.main.setDeadzone(this.scale.width * 1.5);
     }
     
     update()
@@ -48,6 +49,17 @@ export default class BunnyJumpScene extends Phaser.Scene
         const vy = this.player.body.velocity.y
         if (vy > 0 && this.player.texture.key !== "bunny_stand") {
             this.player.setTexture("bunny_stand")
+        }
+        this.horizontalWrap(this.player)
+    }
+    horizontalWrap(sprite) {
+        const halfWidth = sprite.displayWidth * .5;
+        const gameWidth = this.scale.width;
+        if (sprite.x < -halfWidth) {
+            sprite.x = gameWidth + halfWidth;
+        }
+        else if (sprite.x > gameWidth + halfWidth) {
+            sprite.x = -halfWidth;
         }
     }
 }
