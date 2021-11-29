@@ -1,7 +1,9 @@
+/* eslint-disable no-undef */
 module.exports = {
 	root: true,
 	parserOptions: { 
-		ecmaVersion: 6,
+		ecmaVersion: 8,
+		"requireConfigFile": false,
 		sourceType: 'module'
 	},
 	env: {
@@ -11,6 +13,6 @@ module.exports = {
     extends: [
 		'eslint:recommended'
 	],
-	parser: "babel-eslint",
+	parser: "@babel/eslint-parser",
 	rules: {}
 }
