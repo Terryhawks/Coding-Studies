@@ -4,8 +4,10 @@
 import Phaser, { GameObjects } from "phaser"
 import Carrot from "./Carrot";
 var carrots;
+var carrotsCollected;
 var player;
 var platforms;
+var cursors;
 export default class BunnyJumpScene extends Phaser.Scene
 {   constructor() { 
     super("game")
@@ -18,6 +20,7 @@ export default class BunnyJumpScene extends Phaser.Scene
         this.load.image("carrot", "Assets/carrot.png");
         this.load.image("bunny_jump", "Assets/bunny1_jump.png");
         this.load.image("bunny_stand", "Assets/bunny1_stand.png");
+        this.load.audio("jumpSound", "sfx/phaseJump1.ogg")
     }
 
     create()
@@ -33,6 +36,7 @@ export default class BunnyJumpScene extends Phaser.Scene
             const body = platformChild.body;
             body.updateFromGameObject();
         }
+        this.cursors = this.input.keyboard.createCursorKeys()
         this.player = this.physics.add.sprite(240, 320, "bunny_stand").setScale(.25);
         this.physics.add.collider(this.player, this.platforms)
         this.player.body.checkCollision.up = false
@@ -49,29 +53,44 @@ export default class BunnyJumpScene extends Phaser.Scene
             undefined,
             this
         )
+        this.carrotsCollected=0;
     }
     
     update()
     {
         const touchingDown = this.player.body.touching.down
         if (touchingDown){
-            this.player.setVelocityY(-225)
+            this.player.setVelocityY(-250)
             this.player.setTexture("bunny_jump")
+            this.sound.play("jumpSound")
         }
         const vy = this.player.body.velocity.y
         if (vy > 0 && this.player.texture.key !== "bunny_stand") {
             this.player.setTexture("bunny_stand")
         }
+        if (this.cursors.left.isDown && !touchingDown) {
+            this.player.setVelocityX(-175)
+        } else if (this.cursors.right.isDown && !touchingDown) {
+            this.player.setVelocityX(175)
+        } else { this.player.setVelocityX(0) }
         this.platforms.children.iterate(child => {
             const platformChild = child
             const scrollY = this.cameras.main.scrollY
-            if (platformChild.y >= scrollY + 700) {
-                platformChild.y = scrollY - Phaser.Math.Between(50, 100)
+            if (platformChild.y >= scrollY + 650) {
+                platformChild.y = scrollY - Phaser.Math.Between(33, 67)
                 platformChild.body.updateFromGameObject()
                 this.addCarrotAbove(platformChild)
             }
         })
         this.horizontalWrap(this.player)
+        const scoreTextStyle = {color: "#000", fontSize: 24}
+        this.carrotCollectedText = this.add.text(240, 10, "Carrots : 0", scoreTextStyle).setScrollFactor(0).setOrigin(0.5,0)
+        const value = "Carrots : ${this.carrotsCollected}"
+        this.carrotCollectedText.text = value
+        const bottomPlatform = this.findBottomMostPlatform()
+        if (this.player.y > bottomPlatform.y + 125) {
+            this.scene.start("game-over-scene")
+        }
     }
     
     existing() 
@@ -94,6 +113,7 @@ export default class BunnyJumpScene extends Phaser.Scene
     {
         this.carrots.killAndHide(carrot)
         this.physics.world.disableBody(carrot.body)
+        this.carrotsCollected++
     }
 
     addCarrotAbove(sprite)
@@ -103,8 +123,21 @@ export default class BunnyJumpScene extends Phaser.Scene
         carrot.setActive(true)
         carrot.setVisible(true)
         this.add.existing(carrot)
-        carrot.bosy.setSize(carrot.width, carrot.height)
+        carrot.body.setSize(carrot.width, carrot.height)
         this.physics.world.enable(carrot)
         return carrot
+    }
+
+    findBottomMostPlatform() {
+        const platforms = this.platforms.getChildren()
+        let bottomPlatform = platforms[0]
+        for (let i = 1; i < platforms.length; i++) {
+            const platform = platforms[i]
+            if(platform.y < bottomPlatform.y) {
+                continue
+            }
+            bottomPlatform = platform
+        }
+        return bottomPlatform
     }
 }
