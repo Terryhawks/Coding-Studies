@@ -28,14 +28,16 @@ export default class shipbattle extends Phaser.Scene
         this.add.image(gameWidth, gameHeight, "background").setScale(1.2, 1).setScrollFactor(1, 0);
         this.asteroids = this.physics.add.group({
             key: "asteroid",
-            repeat : 5
+            repeat : 10,
+            scale : .25,
         })
         Phaser.Actions.RandomRectangle(this.asteroids.getChildren(), this.physics.world.bounds)
     }
 
     update(time){
-        this.asteroid.children.iterate((child) => {
-            child.setVelocityY(15)
+        this.asteroids.children.iterate((child) => {
+            child.setVelocityY(225)
+            child.angle += 2.5;
             if (child.y > this.scale.height) {
                 child.x = Phaser.Math.Between(10, 400)
                 child.y = child.displayHeight * -1

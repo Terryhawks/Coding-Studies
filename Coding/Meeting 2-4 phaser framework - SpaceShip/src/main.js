@@ -6,6 +6,11 @@ const config = {
 	width: 400,
 	height: 620,
 	physics: {
+		default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: false
+        }
 	},
 	scale: {
 		mode: Phaser.Scale.FIT,
