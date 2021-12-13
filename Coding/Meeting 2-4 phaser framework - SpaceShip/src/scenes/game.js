@@ -16,7 +16,7 @@ export default class shipbattle extends Phaser.Scene
 
     preload(){
         this.load.image("background", "images/SpaceBG.jpg")
-        this.load.image("asteroid", "images/Asteroid.png")
+        this.load.image("asteroid", "images/AsteroidSmall.png")
         this.load.image("left-btn", "images/left-btn.png")
         this.load.image("right-btn", "images/right-btn.png")
         this.load.image("shoot-btn", "images/shoot-btn.png")
@@ -32,6 +32,22 @@ export default class shipbattle extends Phaser.Scene
             scale : .25,
         })
         Phaser.Actions.RandomRectangle(this.asteroids.getChildren(), this.physics.world.bounds)
+        this.createButton()
+    }
+
+    createButton(){
+        this.input.addPointer(3)
+
+        let shoot = this.add.image(320, 550, "shoot-btn").setInteractive().setDepth(.5).setAlpha(.8).setScale(.85)
+        let nav_left = this.add.image(50, 550, "left-btn").setInteractive().setDepth(.5).setAlpha(.8).setScale(.85)
+        let nav_right = this.add.image(nav_left.x + nav_left.displayWidth + 20, 550, "right-btn").setInteractive().setDepth(.5).setAlpha(.8).setScale(.85)
+
+        nav_left.on("pointerdown", () => {this.nav_left = true}, this)
+        nav_left.on("pointerout", () => {this.nav_left = false}, this)
+        nav_right.on("pointerdown", () => {this.nav_right = true}, this)
+        nav_right.on("pointerout", () => {this.nav_right = false}, this)
+        shoot.on("pointerdown", () => {this.shoot = true}, this)
+        shoot.on("pointerout", () => {this.shoot = false}, this)
     }
 
     update(time){
