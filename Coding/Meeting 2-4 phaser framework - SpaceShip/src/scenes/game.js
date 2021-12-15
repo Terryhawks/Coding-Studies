@@ -12,6 +12,9 @@ export default class shipbattle extends Phaser.Scene
         this.nav_left = false
         this.nav_right = false
         this.shoot = false
+        this.player = undefined
+        this.speed = 75
+        this.duration = 1
     }
 
     preload(){
@@ -20,6 +23,7 @@ export default class shipbattle extends Phaser.Scene
         this.load.image("left-btn", "images/left-btn.png")
         this.load.image("right-btn", "images/right-btn.png")
         this.load.image("shoot-btn", "images/shoot-btn.png")
+        this.load.spritesheet("player", "images/ship.png", {frameWidth:66, frameheight:66})
     }
     
     create(){
@@ -33,6 +37,7 @@ export default class shipbattle extends Phaser.Scene
         })
         Phaser.Actions.RandomRectangle(this.asteroids.getChildren(), this.physics.world.bounds)
         this.createButton()
+        this.player = this.createPlayer()
     }
 
     createButton(){
@@ -49,15 +54,59 @@ export default class shipbattle extends Phaser.Scene
         shoot.on("pointerdown", () => {this.shoot = true}, this)
         shoot.on("pointerout", () => {this.shoot = false}, this)
     }
+    
+    createPlayer(){
+        const player = this.physics.add.sprite(200, 450, "player")
+        player.setCollideWorldBounds(true)
+        
+        this.anims.create({
+            key: "turn",
+            frames:[{ key: "player", frame: 0 }]
+        })
+        
+        this.anims.create({
+            key: "left",
+            frames: this.anims.generateFrameNumbers("player", {start: 1, end: 2}),
+            frameRate: 10
+        })
+        
+        this.anims.create({
+            key: "right",
+            frames: this.anims.generateFrameNumbers("player", {start: 1, end: 2}),
+            frameRate: 10
+        })
+        
+        return player;
+    }
 
     update(time){
         this.asteroids.children.iterate((child) => {
-            child.setVelocityY(225)
+            child.setVelocityY(this.speed*this.duration)
             child.angle += 2.5;
             if (child.y > this.scale.height) {
                 child.x = Phaser.Math.Between(10, 400)
                 child.y = child.displayHeight * -1
             }
         })
+        this.duration = this.duration+0.000875
+        this.movePlayer(this.player)
+    }
+
+    movePlayer(){
+        if (this.nav_left) {
+            this.player.setVelocityX(this.speed*-1)
+            this.player.anims.play("left", true)
+            this.player.setFlipX(false)
+            this.player.setVelocityY(-5)
+        }else if (this.nav_right) {
+            this.player.setVelocityX(this.speed*1)
+            this.player.anims.play("right", true)
+            this.player.setFlipX(true)
+            this.player.setVelocityY(-5)
+        }else {
+            this.player.setVelocity(0)
+            this.player.anims.play("turn")
+            this.player.setVelocityY(-5)
+        }
     }
 }
