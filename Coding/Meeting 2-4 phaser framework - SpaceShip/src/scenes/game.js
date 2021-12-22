@@ -1,6 +1,7 @@
 // @ts-nocheck
 /* eslint-disable no-unused-vars */
 import Phaser, { Display } from "phaser"
+import FallingObject from "./ui/FallingObject"
 export default class shipbattle extends Phaser.Scene
 {
     constructor(){
@@ -15,6 +16,8 @@ export default class shipbattle extends Phaser.Scene
         this.player = undefined
         this.speed = 75
         this.duration = 1
+        this.enemies = undefined
+        this.enemySpeed = 45
     }
 
     preload(){
@@ -107,6 +110,23 @@ export default class shipbattle extends Phaser.Scene
             this.player.setVelocity(0)
             this.player.anims.play("turn")
             this.player.setVelocityY(-5)
+        }
+    }
+    
+    spawnEnemy(){
+        const config = {
+            speed : this.enemySpeed,
+            rotation : 0.6
+        }
+
+        const enemy = this.enemies.get(0, 0, "enemy", config)
+
+        const enemyWidth = enemy.displayWidth
+
+        this.positionX = Phaser.Math.Between(enemyWidth, this.scale.width - enemyWidth)
+
+        if (enemy) {
+            enemy.spawn(this.positionX)
         }
     }
 }
