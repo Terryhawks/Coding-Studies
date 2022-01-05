@@ -26,6 +26,7 @@ export default class shipbattle extends Phaser.Scene
         this.load.image("left-btn", "images/left-btn.png")
         this.load.image("right-btn", "images/right-btn.png")
         this.load.image("shoot-btn", "images/shoot-btn.png")
+        this.load.image("enemy", "images/enemy.png")
         this.load.spritesheet("player", "images/ship.png", {frameWidth:66, frameheight:66})
     }
     
@@ -34,13 +35,24 @@ export default class shipbattle extends Phaser.Scene
         const gameWidth = this.scale.width * .5
         this.add.image(gameWidth, gameHeight, "background").setScale(1.2, 1).setScrollFactor(1, 0);
         this.asteroids = this.physics.add.group({
-            key: "asteroid",
+            key : "asteroid",
             repeat : 10,
             scale : .25,
         })
         Phaser.Actions.RandomRectangle(this.asteroids.getChildren(), this.physics.world.bounds)
         this.createButton()
         this.player = this.createPlayer()
+        this.enemies = this.physics.add.group({
+            classType : FallingObject,
+            maxSize : 10,
+            runChildUpdate : true
+        })
+        this.time.addEvent({
+            delay : 4000,
+            callback : this.spawnEnemy,
+            callbackScope : this,
+            loop : true
+        })
     }
 
     createButton(){
@@ -116,10 +128,10 @@ export default class shipbattle extends Phaser.Scene
     spawnEnemy(){
         const config = {
             speed : this.enemySpeed,
-            rotation : 0.6
+            rotation : 0
         }
 
-        const enemy = this.enemies.get(0, 0, "enemy", config)
+        const enemy = this.enemies.get(0, 0, "enemy", config).setScale(0.1725)
 
         const enemyWidth = enemy.displayWidth
 
