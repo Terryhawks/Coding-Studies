@@ -18,6 +18,7 @@ export default class shipbattle extends Phaser.Scene
         this.duration = 1
         this.enemies = undefined
         this.enemySpeed = 45
+        this.spawnSpeed = 1
     }
 
     preload(){
@@ -48,7 +49,7 @@ export default class shipbattle extends Phaser.Scene
             runChildUpdate : true
         })
         this.time.addEvent({
-            delay : 4000,
+            delay : 4000 * this.spawnSpeed,
             callback : this.spawnEnemy,
             callbackScope : this,
             loop : true
@@ -105,6 +106,7 @@ export default class shipbattle extends Phaser.Scene
         })
         this.duration = this.duration+0.000875
         this.movePlayer(this.player)
+        this.spawnSpeed = this.spawnSpeed - 0.005;
     }
 
     movePlayer(){
@@ -128,10 +130,13 @@ export default class shipbattle extends Phaser.Scene
     spawnEnemy(){
         const config = {
             speed : this.enemySpeed,
-            rotation : 0
+            rotation : 0.0000001 * this.duration
         }
 
-        const enemy = this.enemies.get(0, 0, "enemy", config).setScale(0.1725)
+        const enemy = this.enemies.get(0, 0, "enemy", config)
+        enemy.setScale(0.1725).refreshBody()
+
+        console.log (enemy)
 
         const enemyWidth = enemy.displayWidth
 
