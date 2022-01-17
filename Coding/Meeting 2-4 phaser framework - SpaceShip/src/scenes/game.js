@@ -1,7 +1,8 @@
 // @ts-nocheck
 /* eslint-disable no-unused-vars */
 import Phaser, { Display } from "phaser"
-import FallingObject from "./ui/FallingObject"
+import FallingObject from "../ui/FallingObject"
+import Laser from "../ui/Laser"
 export default class shipbattle extends Phaser.Scene
 {
     constructor(){
@@ -19,6 +20,8 @@ export default class shipbattle extends Phaser.Scene
         this.enemies = undefined
         this.enemySpeed = 45
         this.spawnSpeed = 1
+        this.lasers = undefined
+        this.lastFired = 0
     }
 
     preload(){
@@ -29,6 +32,7 @@ export default class shipbattle extends Phaser.Scene
         this.load.image("shoot-btn", "images/shoot-btn.png")
         this.load.image("enemy", "images/enemy.png")
         this.load.spritesheet("player", "images/ship.png", {frameWidth:66, frameheight:66})
+        this.load.spritesheet("laser", "images/laser-spritesheet.png", {frameWidth: 402, frameHeight: 402, startFrame:0, endFrame: 804})
     }
     
     create(){
@@ -53,6 +57,11 @@ export default class shipbattle extends Phaser.Scene
             callback : this.spawnEnemy,
             callbackScope : this,
             loop : true
+        })
+        this.lasers = this.physics.add.group({
+            classType : Laser,
+            maxSize : 10,
+            runChildUpdate : true
         })
     }
 
@@ -105,11 +114,11 @@ export default class shipbattle extends Phaser.Scene
             }
         })
         this.duration = this.duration+0.000875
-        this.movePlayer(this.player)
+        this.movePlayer(this.player, time)
         this.spawnSpeed = this.spawnSpeed - 0.005;
     }
 
-    movePlayer(){
+    movePlayer(player, time){
         if (this.nav_left) {
             this.player.setVelocityX(this.speed*-1)
             this.player.anims.play("left", true)
@@ -125,6 +134,13 @@ export default class shipbattle extends Phaser.Scene
             this.player.anims.play("turn")
             this.player.setVelocityY(-5)
         }
+        if((this.shoot) && time>this.lastFired){
+            const laser = this.lasers.get(0, 0, "laser")
+            if(laser){
+                laser.fire(this.player.x, this.player.y)
+                this.lastFired = time + 225
+            }
+        }
     }
     
     spawnEnemy(){
@@ -132,7 +148,7 @@ export default class shipbattle extends Phaser.Scene
             speed : this.enemySpeed,
             rotation : 0.0000001 * this.duration
         }
-
+        console.log(config + "config")
         const enemy = this.enemies.get(0, 0, "enemy", config)
         enemy.setScale(0.1725).refreshBody()
 
@@ -145,5 +161,10 @@ export default class shipbattle extends Phaser.Scene
         if (enemy) {
             enemy.spawn(this.positionX)
         }
+    }
+    
+    hitEnemy(laser, enemy){
+        laser.erase()
+        enemy.die()
     }
 }

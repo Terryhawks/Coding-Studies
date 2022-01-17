@@ -27,7 +27,7 @@ export default class FallingObject extends Phaser.Physics.Arcade.Sprite{
     update(time) {
         this.setVelocityY(this.speed)
         this.rotation += this.rotationVal
-        const gameHeight = this.scene.scale.gameHeight
+        const gameHeight = this.scene.scale.height
 
         if (this.y > gameHeight + 5) {
             this.die()

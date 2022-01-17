@@ -1,0 +1,29 @@
+// @ts-nocheck
+/* eslint-disable no-unused-vars */
+import Phaser from "phaser"
+
+export default class Laser extends Phaser.Physics.Arcade.Sprite
+{
+    constructor(scene, x, y, texture){
+        super(scene, x, y, texture)
+        this.setScale(0.125)
+        this.speed = 200
+    }
+    
+    fire(x,y){
+        this.setPosition(x, y - 50)
+        this.setActive(true)
+        this.setVisible(true)
+    }
+
+    erase(){
+        this.destroy()
+    }
+
+    update(time){
+        this.setVelocityY(this.speed*-1.8975)
+        if(this.y<0){
+            this.erase()
+        }
+    }
+}
