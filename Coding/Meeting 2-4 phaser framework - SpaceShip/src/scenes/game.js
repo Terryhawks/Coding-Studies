@@ -32,7 +32,8 @@ export default class shipbattle extends Phaser.Scene
         this.load.image("shoot-btn", "images/shoot-btn.png")
         this.load.image("enemy", "images/enemy.png")
         this.load.spritesheet("player", "images/ship.png", {frameWidth:66, frameheight:66})
-        this.load.spritesheet("laser", "images/laser-spritesheet.png", {frameWidth: 402, frameHeight: 402, startFrame:0, endFrame: 804})
+        this.load.image("laser-1", "images/laser-1.png")
+        this.load.image("laser-2", "images/laser-2.png")
     }
     
     create(){
@@ -135,10 +136,19 @@ export default class shipbattle extends Phaser.Scene
             this.player.setVelocityY(-5)
         }
         if((this.shoot) && time>this.lastFired){
-            const laser = this.lasers.get(0, 0, "laser")
+            const laser = this.lasers.get(0, 0, "laser-1")
             if(laser){
                 laser.fire(this.player.x, this.player.y)
+
                 this.lastFired = time + 225
+                if (time%2!=0 && laser.texture.key == "laser-2") {
+                    laser.setTexture("laser-1")
+                    console.log("1")
+                }
+                if (time%2==0 && laser.texture.key == "laser-1") {
+                    laser.setTexture("laser-2")
+                    console.log("2")
+                }
             }
         }
     }
@@ -148,11 +158,9 @@ export default class shipbattle extends Phaser.Scene
             speed : this.enemySpeed,
             rotation : 0.0000001 * this.duration
         }
-        console.log(config + "config")
         const enemy = this.enemies.get(0, 0, "enemy", config)
         enemy.setScale(0.1725).refreshBody()
 
-        console.log (enemy)
 
         const enemyWidth = enemy.displayWidth
 
