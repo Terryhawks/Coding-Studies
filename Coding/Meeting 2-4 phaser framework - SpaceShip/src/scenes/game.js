@@ -22,6 +22,8 @@ export default class shipbattle extends Phaser.Scene
         this.spawnSpeed = 1
         this.lasers = undefined
         this.lastFired = 0
+        this.cursors = this.input.keyboard.createCursorKeys();
+        this.bgasteroidspd = 75
     }
 
     preload(){
@@ -64,6 +66,7 @@ export default class shipbattle extends Phaser.Scene
             maxSize : 10,
             runChildUpdate : true
         })
+        this.physics.add.overlap(this.lasers, this.enemies, this.hitEnemy);
     }
 
     createButton(){
@@ -73,9 +76,9 @@ export default class shipbattle extends Phaser.Scene
         let nav_left = this.add.image(50, 550, "left-btn").setInteractive().setDepth(.5).setAlpha(.8).setScale(.85)
         let nav_right = this.add.image(nav_left.x + nav_left.displayWidth + 20, 550, "right-btn").setInteractive().setDepth(.5).setAlpha(.8).setScale(.85)
 
-        nav_left.on("pointerdown", () => {this.nav_left = true}, this)
+        nav_left.on("pointerdown", () => {this.nav_right = false; this.nav_left = true}, this)
         nav_left.on("pointerout", () => {this.nav_left = false}, this)
-        nav_right.on("pointerdown", () => {this.nav_right = true}, this)
+        nav_right.on("pointerdown", () => {this.nav_left = false; this.nav_right = true}, this)
         nav_right.on("pointerout", () => {this.nav_right = false}, this)
         shoot.on("pointerdown", () => {this.shoot = true}, this)
         shoot.on("pointerout", () => {this.shoot = false}, this)
@@ -107,16 +110,26 @@ export default class shipbattle extends Phaser.Scene
 
     update(time){
         this.asteroids.children.iterate((child) => {
-            child.setVelocityY(this.speed*this.duration)
+            child.setVelocityY(this.bgasteroidspd)
             child.angle += 2.5;
             if (child.y > this.scale.height) {
                 child.x = Phaser.Math.Between(10, 400)
                 child.y = child.displayHeight * -1
             }
+            if (this.bgasteroidspd < 750) {
+                this.bgasteroidspd = this.bgasteroidspd + 0.0115
+            }
         })
         this.duration = this.duration+0.000875
         this.movePlayer(this.player, time)
         this.spawnSpeed = this.spawnSpeed - 0.005;
+        if (this.cursors.space.isDown){
+            this.shoot = true
+        }
+        if (this.cursors.space.isUp){
+            this.shoot = false
+        }
+        console.log(this.bgasteroidspd)
     }
 
     movePlayer(player, time){
@@ -124,16 +137,13 @@ export default class shipbattle extends Phaser.Scene
             this.player.setVelocityX(this.speed*-1)
             this.player.anims.play("left", true)
             this.player.setFlipX(false)
-            this.player.setVelocityY(-5)
         }else if (this.nav_right) {
             this.player.setVelocityX(this.speed*1)
             this.player.anims.play("right", true)
             this.player.setFlipX(true)
-            this.player.setVelocityY(-5)
         }else {
             this.player.setVelocity(0)
             this.player.anims.play("turn")
-            this.player.setVelocityY(-5)
         }
         if((this.shoot) && time>this.lastFired){
             const laser = this.lasers.get(0, 0, "laser-1")
@@ -150,6 +160,23 @@ export default class shipbattle extends Phaser.Scene
                     console.log("2")
                 }
             }
+        }
+        if (this.cursors.left.isDown || this.nav_left){
+            this.nav_right = false
+            this.nav_left = true
+        }
+        if (this.cursors.right.isDown || this.nav_right){
+            this.nav_left = false
+            this.nav_right = true
+        }
+        if (this.cursors.down.isDown){
+            this.player.setVelocityY(145)
+        }
+        if (this.cursors.up.isDown){
+            this.player.setVelocityY(-155)
+        }
+        if (this.cursors.up.isUp && this.cursors.down.isUp){
+            this.player.setVelocityY(-5)
         }
     }
     
