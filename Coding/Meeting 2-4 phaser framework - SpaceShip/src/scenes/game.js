@@ -25,7 +25,8 @@ export default class shipbattle extends Phaser.Scene
         this.lastFired = 0
         this.cursors = this.input.keyboard.createCursorKeys();
         this.bgasteroidspd = 75
-        this.ScoreLabel = undefined
+        this.scoreLabel = 0
+        this.fireRate = 225
     }
 
     preload(){
@@ -68,7 +69,7 @@ export default class shipbattle extends Phaser.Scene
             maxSize : 10,
             runChildUpdate : true
         })
-        this.physics.add.overlap(this.lasers, this.enemies, this.hitEnemy);
+        this.physics.add.overlap(this.lasers, this.enemies, this.hitEnemy, undefined, this);
         this.scoreLabel = this.createScoreLabel(16, 16, 0)
     }
 
@@ -132,7 +133,7 @@ export default class shipbattle extends Phaser.Scene
         if (this.cursors.space.isUp){
             this.shoot = false
         }
-        console.log(this.bgasteroidspd)
+        //console.log(this.bgasteroidspd)
     }
 
     movePlayer(player, time){
@@ -153,15 +154,16 @@ export default class shipbattle extends Phaser.Scene
             if(laser){
                 laser.fire(this.player.x, this.player.y)
 
-                this.lastFired = time + 225
+                this.lastFired = time + this.fireRate
                 if (time%2!=0 && laser.texture.key == "laser-2") {
                     laser.setTexture("laser-1")
-                    console.log("1")
                 }
                 if (time%2==0 && laser.texture.key == "laser-1") {
                     laser.setTexture("laser-2")
-                    console.log("2")
+                    console.log("Crit!")
                 }
+
+                //console.log(this.fireRate)
             }
         }
         if (this.cursors.left.isDown || this.nav_left){
@@ -206,12 +208,21 @@ export default class shipbattle extends Phaser.Scene
         enemy.die()
         this.scoreLabel.add(25)
         if(this.scoreLabel.getscore()%100 == 0){
-            this.enemySpeed += 45
+            if(this.enemySpeed < 255){
+                this.enemySpeed += 30
+            }
+            if(this.speed < 175){
+                this.speed += 25
+            }
+            if(this.fireRate > 82.5){
+                this.fireRate -= 7.5
+            }
         }
+        console.log("hit!")
     }
 
     createScoreLabel(x, y, score){
-        const style = { fontSize : "32px", fill : "#000"}
+        const style = { fontSize : "32px", fill : "#fff"}
         const label = new ScoreLabel(this, x, y, score, style).setDepth(1)
 
         this.add.existing(label)
