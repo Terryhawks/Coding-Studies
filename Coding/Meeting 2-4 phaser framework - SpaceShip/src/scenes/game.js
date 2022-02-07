@@ -4,6 +4,7 @@ import Phaser, { Display } from "phaser"
 import FallingObject from "../ui/FallingObject"
 import Laser from "../ui/Laser"
 import ScoreLabel from "../ui/ScoreLabel"
+import LifeLabel from "../ui/LifeLabel"
 export default class shipbattle extends Phaser.Scene
 {
     constructor(){
@@ -27,6 +28,7 @@ export default class shipbattle extends Phaser.Scene
         this.bgasteroidspd = 75
         this.scoreLabel = 0
         this.fireRate = 225
+        this.lifelabel = undefined
     }
 
     preload(){
@@ -71,6 +73,7 @@ export default class shipbattle extends Phaser.Scene
         })
         this.physics.add.overlap(this.lasers, this.enemies, this.hitEnemy, undefined, this);
         this.scoreLabel = this.createScoreLabel(16, 16, 0)
+        this.lifeLabel = this.createLifeLabel(16, 43, 5)
     }
 
     createButton(){
@@ -224,6 +227,15 @@ export default class shipbattle extends Phaser.Scene
     createScoreLabel(x, y, score){
         const style = { fontSize : "32px", fill : "#fff"}
         const label = new ScoreLabel(this, x, y, score, style).setDepth(1)
+
+        this.add.existing(label)
+
+        return label
+    }
+
+    createLifeLabel(x, y, life){
+        const style = { fontSize : "32px", fill : "#fff"}
+        const label = new LifeLabel(this, x, y, life, style).setDepth(1)
 
         this.add.existing(label)
 
