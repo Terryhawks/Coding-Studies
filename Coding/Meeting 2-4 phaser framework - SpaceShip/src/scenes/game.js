@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // @ts-nocheck
 /* eslint-disable no-unused-vars */
 import Phaser, { Display } from "phaser"
@@ -30,6 +31,7 @@ export default class shipbattle extends Phaser.Scene
         this.scoreLabel = 0
         this.fireRate = 225
         this.lifelabel = undefined
+        this.lifeRestore = undefined
     }
 
     preload(){
@@ -42,6 +44,7 @@ export default class shipbattle extends Phaser.Scene
         this.load.spritesheet("player", "images/ship.png", {frameWidth:66, frameheight:66})
         this.load.image("laser-1", "images/laser-1.png")
         this.load.image("laser-2", "images/laser-2.png")
+        this.load.image("life-Restore", "image/PowerUp.png")
     }
     
     create(){
@@ -76,6 +79,16 @@ export default class shipbattle extends Phaser.Scene
         this.physics.add.overlap(this.player, this.enemies, this.decreaseLife, null, this);
         this.scoreLabel = this.createScoreLabel(16, 16, 0)
         this.lifeLabel = this.createLifeLabel(16, 43, 5)
+        this.lifeRestore = this.physics.add.group({
+            classType : FallingObject,
+            runChildUpdate : true
+        })
+        this.time.addEvent({
+            delay : 10000, 
+            callback : this.spawnLife,
+            callbackScope : this,
+            loop : true
+        })
     }
 
     createButton(){
@@ -198,7 +211,6 @@ export default class shipbattle extends Phaser.Scene
         const enemy = this.enemies.get(0, 0, "enemy", config)
         enemy.setScale(0.1725).refreshBody()
 
-
         const enemyWidth = enemy.displayWidth
 
         this.positionX = Phaser.Math.Between(enemyWidth, this.scale.width - enemyWidth)
@@ -208,6 +220,23 @@ export default class shipbattle extends Phaser.Scene
         }
     }
     
+    spawnLife(){
+        const config = {
+            speed : 45,
+            rotation : 0.0000001 * this.duration
+        }
+        const lifeUp = this.lifeRestore.get(0, 0, "life-Restore", config)
+        lifeUp.setScale(0.375).refreshBody()
+
+        const LifeUpWidth = lifeUp.displayWidth
+
+        this.positionX = Phaser.Math.Between(LifeUpWidth, this.scale.width - LifeUpWidth)
+
+        if (lifeUp) {
+            lifeUp.spawn(this.positionX)
+        }
+    }
+
     hitEnemy(laser, enemy){
         laser.erase()
         enemy.die()
@@ -223,7 +252,8 @@ export default class shipbattle extends Phaser.Scene
                 this.fireRate -= 7.5
             }
         }
-        console.log("hit!")
+        console.log("Hit!")
+        this.MoreLife();
     }
 
     createScoreLabel(x, y, score){
@@ -248,7 +278,26 @@ export default class shipbattle extends Phaser.Scene
         enemy.die()
         this.lifeLabel.subtract(1)
 
-        if(this.lifeLabel.getLife()==2){
+        player.setTint(0xffffff)
+        this.LifeChange()
+    }
+
+    MoreLife(){
+        if(this.scoreLabel.getscore()%200 == 0){
+            this.lifeLabel.add(1)
+            this.LifeChange()
+            console.log("1 Up")
+        }
+        if (this.duration%2==0) {
+            spawnLife()
+            console.log("Drop!")
+        }
+    }
+
+    LifeChange(player){
+        if(this.lifeLabel.getLife()>2){
+            player.setTint(0xffffff)
+        }else if(this.lifeLabel.getLife()==2){
             player.setTint(0xff0000)
         }else if(this.lifeLabel.getLife()==1){
             player.setTint(0xff0000).setAlpha(0.2)
