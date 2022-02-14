@@ -5,6 +5,7 @@ import FallingObject from "../ui/FallingObject"
 import Laser from "../ui/Laser"
 import ScoreLabel from "../ui/ScoreLabel"
 import LifeLabel from "../ui/LifeLabel"
+import GameOverScene from "./GameOver"
 export default class shipbattle extends Phaser.Scene
 {
     constructor(){
@@ -72,6 +73,7 @@ export default class shipbattle extends Phaser.Scene
             runChildUpdate : true
         })
         this.physics.add.overlap(this.lasers, this.enemies, this.hitEnemy, undefined, this);
+        this.physics.add.overlap(this.player, this.enemies, this.decreaseLife, null, this);
         this.scoreLabel = this.createScoreLabel(16, 16, 0)
         this.lifeLabel = this.createLifeLabel(16, 43, 5)
     }
@@ -240,5 +242,18 @@ export default class shipbattle extends Phaser.Scene
         this.add.existing(label)
 
         return label
+    }
+
+    decreaseLife(player, enemy){
+        enemy.die()
+        this.lifeLabel.subtract(1)
+
+        if(this.lifeLabel.getLife()==2){
+            player.setTint(0xff0000)
+        }else if(this.lifeLabel.getLife()==1){
+            player.setTint(0xff0000).setAlpha(0.2)
+        }else if(this.lifeLabel.getLife()==0){
+            this.scene.start("GameOverScene", {score : this.scoreLabel.getscore()})
+        }
     }
 }

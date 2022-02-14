@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import shipbattle from "./scenes/game.js"
+import GameOverScene from "./scenes/GameOver"
 
 const config = {
 	type: Phaser.AUTO,
@@ -16,7 +17,7 @@ const config = {
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_BOTH
 	},
-	scene: [shipbattle]
+	scene: [shipbattle, GameOverScene]
 }
 
 export default new Phaser.Game(config)

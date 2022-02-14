@@ -1,8 +1,9 @@
 // @ts-nocheck
 /* eslint-disable no-unused-vars */
 import Phaser, { Display } from "phaser"
+import shipbattle from "./game.js"
 
-var replay_btn
+var replayButton
 
 export default class GameOverScene extends Phaser.Scene
 {
@@ -25,9 +26,9 @@ export default class GameOverScene extends Phaser.Scene
         const gameWidth = this.scale.width * .5
         this.add.image(gameWidth, gameHeight, "background").setScale(1.2, 1).setScrollFactor(1, 0);
         this.add.image(200, 200, "gameOver")
-        this.replay_btn = this.add.image(200, 530, "replay")
-        this.replay_btn.once("pointerup", () => {this.scene.start("ship-scene")}, this)
-        this.add.text(80, 300, "SCORE:", { fontSize: "60px", fill: "#000" })
-        this.add.text(300, 300, this.score, { fontSize: "60px", fill: "#000"})
+        this.replayButton = this.add.image(200, 530, "replay")
+        this.replayButton.once("pointerup", () => {this.scene.start("ship-scene")}, this)
+        this.add.text(80, 300, "SCORE:", { fontSize: "45px", fill: "#fff" })
+        this.add.text(300, 300, this.score, { fontSize: "45px", fill: "#fff"})
     }
 }
