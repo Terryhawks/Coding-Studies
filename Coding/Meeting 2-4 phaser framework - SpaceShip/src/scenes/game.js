@@ -6,7 +6,6 @@ import FallingObject from "../ui/FallingObject"
 import Laser from "../ui/Laser"
 import ScoreLabel from "../ui/ScoreLabel"
 import LifeLabel from "../ui/LifeLabel"
-import GameOverScene from "./GameOver"
 export default class shipbattle extends Phaser.Scene
 {
     constructor(){
@@ -44,7 +43,13 @@ export default class shipbattle extends Phaser.Scene
         this.load.spritesheet("player", "images/ship.png", {frameWidth:66, frameheight:66})
         this.load.image("laser-1", "images/laser-1.png")
         this.load.image("laser-2", "images/laser-2.png")
-        this.load.image("life-Restore", "image/PowerUp.png")
+        this.load.image("life-Restore", "images/PowerUp.png")
+        this.load.audio("laser-shot", "audio/Laser-Shot.mp3")
+        this.load.audio("lifeUp-Kill", "audio/Kill-LifeUp.mp3")
+        this.load.audio("lifeUp-Repair", "audio/Repair-LifeUp.mp3")
+        this.load.audio("life-lost", "audio/Life-Lost.mp3")
+        this.load.audio("defeat", "audio/defeat.mp3")
+        this.load.audio("enemy-destroy", "audio/Enemy-Destroy.mp3")
     }
     
     create(){
@@ -77,6 +82,7 @@ export default class shipbattle extends Phaser.Scene
         })
         this.physics.add.overlap(this.lasers, this.enemies, this.hitEnemy, undefined, this);
         this.physics.add.overlap(this.player, this.enemies, this.decreaseLife, null, this);
+        this.physics.add.overlap(this.player, this.lifeRestore, this.increaseLife, null, this);
         this.scoreLabel = this.createScoreLabel(16, 16, 0)
         this.lifeLabel = this.createLifeLabel(16, 43, 5)
         this.lifeRestore = this.physics.add.group({
@@ -107,7 +113,7 @@ export default class shipbattle extends Phaser.Scene
     }
     
     createPlayer(){
-        const player = this.physics.add.sprite(200, 450, "player")
+        const player = this.physics.add.sprite(200, 450, "player").setDepth(0.875)
         player.setCollideWorldBounds(true)
         
         this.anims.create({
@@ -144,7 +150,9 @@ export default class shipbattle extends Phaser.Scene
         })
         this.duration = this.duration+0.000875
         this.movePlayer(this.player, time)
-        this.spawnSpeed = this.spawnSpeed - 0.005;
+        if(this.spawnSpeed > 0.25){
+            this.spawnSpeed = this.spawnSpeed - 0.005;
+        }
         if (this.cursors.space.isDown){
             this.shoot = true
         }
@@ -168,7 +176,7 @@ export default class shipbattle extends Phaser.Scene
             this.player.anims.play("turn")
         }
         if((this.shoot) && time>this.lastFired){
-            const laser = this.lasers.get(0, 0, "laser-1")
+            const laser = this.lasers.get(0, 0, "laser-1").setDepth(0.9)
             if(laser){
                 laser.fire(this.player.x, this.player.y)
 
@@ -180,6 +188,8 @@ export default class shipbattle extends Phaser.Scene
                     laser.setTexture("laser-2")
                     console.log("Crit!")
                 }
+
+                this.sound.play("laser-shot")
 
                 //console.log(this.fireRate)
             }
@@ -208,7 +218,7 @@ export default class shipbattle extends Phaser.Scene
             speed : this.enemySpeed,
             rotation : 0.0000001 * this.duration
         }
-        const enemy = this.enemies.get(0, 0, "enemy", config)
+        const enemy = this.enemies.get(0, 0, "enemy", config).setDepth(0.85)
         enemy.setScale(0.1725).refreshBody()
 
         const enemyWidth = enemy.displayWidth
@@ -225,7 +235,7 @@ export default class shipbattle extends Phaser.Scene
             speed : 45,
             rotation : 0.0000001 * this.duration
         }
-        const lifeUp = this.lifeRestore.get(0, 0, "life-Restore", config)
+        const lifeUp = this.lifeRestore.get(0, 0, "life-Restore", config).setDepth(0.8)
         lifeUp.setScale(0.375).refreshBody()
 
         const LifeUpWidth = lifeUp.displayWidth
@@ -253,11 +263,12 @@ export default class shipbattle extends Phaser.Scene
             }
         }
         console.log("Hit!")
+        this.sound.play("enemy-destroy")
         this.MoreLife();
     }
 
     createScoreLabel(x, y, score){
-        const style = { fontSize : "32px", fill : "#fff"}
+        const style = { fontSize : "16px", fill : "#fff"}
         const label = new ScoreLabel(this, x, y, score, style).setDepth(1)
 
         this.add.existing(label)
@@ -266,7 +277,7 @@ export default class shipbattle extends Phaser.Scene
     }
 
     createLifeLabel(x, y, life){
-        const style = { fontSize : "32px", fill : "#fff"}
+        const style = { fontSize : "16px", fill : "#fff"}
         const label = new LifeLabel(this, x, y, life, style).setDepth(1)
 
         this.add.existing(label)
@@ -277,14 +288,22 @@ export default class shipbattle extends Phaser.Scene
     decreaseLife(player, enemy){
         enemy.die()
         this.lifeLabel.subtract(1)
+        this.sound.play("life-lost")
+        this.LifeChange(this.player)
+    }
 
-        player.setTint(0xffffff)
-        this.LifeChange()
+    increaseLife(player, repair){
+        repair.die()
+        this.lifeLabel.add(1)
+        this.sound.play("lifeUp-Repair")
+        this.LifeChange(this.player)
+        player.clearAlpha().clearTint()
     }
 
     MoreLife(){
         if(this.scoreLabel.getscore()%200 == 0){
             this.lifeLabel.add(1)
+            this.sound.play("lifeUp-Kill")
             this.LifeChange()
             console.log("1 Up")
         }
@@ -296,12 +315,15 @@ export default class shipbattle extends Phaser.Scene
 
     LifeChange(player){
         if(this.lifeLabel.getLife()>2){
-            player.setTint(0xffffff)
+            this.player.clearTint().clearAlpha()
         }else if(this.lifeLabel.getLife()==2){
-            player.setTint(0xff0000)
+            player.setTint(0xff0000).clearAlpha()
+            console.log("Hull Damaged. Please get a Repair Ball.")
         }else if(this.lifeLabel.getLife()==1){
             player.setTint(0xff0000).setAlpha(0.2)
+            console.log("Hull almost Broken. Please get a Repair Ball.")
         }else if(this.lifeLabel.getLife()==0){
+            this.sound.play("defeat")
             this.scene.start("GameOverScene", {score : this.scoreLabel.getscore()})
         }
     }
