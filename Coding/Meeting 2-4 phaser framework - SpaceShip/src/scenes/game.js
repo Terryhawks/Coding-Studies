@@ -6,8 +6,7 @@ import FallingObject from "../ui/FallingObject"
 import Laser from "../ui/Laser"
 import ScoreLabel from "../ui/ScoreLabel"
 import LifeLabel from "../ui/LifeLabel"
-export default class shipbattle extends Phaser.Scene
-{
+export default class shipbattle extends Phaser.Scene{
     constructor(){
     super("ship-scene")
     }

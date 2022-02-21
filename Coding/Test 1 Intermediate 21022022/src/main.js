@@ -1,18 +1,20 @@
-import Phaser from 'phaser'
+// @ts-nocheck
+/* eslint-disable no-unused-vars */
+import Phaser from "phaser"
 
-import AmongUsScene from './scenes/AmongUsScene.js'
+import GhostBuster from './scenes/GhostBuster'
 
 const config = {
 	type: Phaser.AUTO,
-	width: 1000,
-	height: 750,
+	width: 600,
+	height: 930,
 	physics: {
 		default: 'arcade',
 		arcade: {
-			gravity: { y: 200 }
+			gravity: { y: 0 }
 		}
 	},
-	scene: [AmongUsScene]
+	scene: [GhostBuster]
 }
 
 export default new Phaser.Game(config)

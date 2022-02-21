@@ -1,4 +1,6 @@
-import Phaser from 'phaser'
+// @ts-nocheck
+/* eslint-disable no-unused-vars */
+import Phaser from "phaser"
 
 export default class Ghost extends Phaser.Physics.Arcade.Sprite
 {
