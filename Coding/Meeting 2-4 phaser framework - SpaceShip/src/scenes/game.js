@@ -236,7 +236,7 @@ export default class shipbattle extends Phaser.Scene
             rotation : 0.0000001 * this.duration
         }
         const lifeUp = this.lifeRestore.get(0, 0, "life-Restore", config).setDepth(0.8)
-        lifeUp.setScale(0.375).refreshBody()
+        lifeUp.setScale(0.225).refreshBody()
 
         const LifeUpWidth = lifeUp.displayWidth
 
