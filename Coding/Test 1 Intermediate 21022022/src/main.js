@@ -6,8 +6,8 @@ import GhostBuster from './scenes/GhostBuster'
 
 const config = {
 	type: Phaser.AUTO,
-	width: 600,
-	height: 930,
+	width: 575,
+	height: 615,
 	physics: {
 		default: 'arcade',
 		arcade: {

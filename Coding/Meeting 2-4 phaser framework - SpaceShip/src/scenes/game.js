@@ -79,21 +79,22 @@ export default class shipbattle extends Phaser.Scene{
             maxSize : 10,
             runChildUpdate : true
         })
-        this.physics.add.overlap(this.lasers, this.enemies, this.hitEnemy, undefined, this);
-        this.physics.add.overlap(this.player, this.enemies, this.decreaseLife, null, this);
-        this.physics.add.overlap(this.player, this.lifeRestore, this.increaseLife, null, this);
-        this.scoreLabel = this.createScoreLabel(16, 16, 0)
-        this.lifeLabel = this.createLifeLabel(16, 43, 5)
         this.lifeRestore = this.physics.add.group({
             classType : FallingObject,
             runChildUpdate : true
         })
         this.time.addEvent({
-            delay : 10000, 
+            delay : 15000, 
             callback : this.spawnLife,
             callbackScope : this,
             loop : true
         })
+        this.physics.add.overlap(this.lasers, this.enemies, this.hitEnemy, undefined, this);
+        this.physics.add.overlap(this.player, this.enemies, this.decreaseLife, null, this);
+        this.physics.add.overlap(this.player, this.lifeRestore, this.increaseLife, null, this);
+        this.scoreLabel = this.createScoreLabel(16, 16, 0)
+        this.lifeLabel = this.createLifeLabel(16, 43, 5)
+        
     }
 
     createButton(){
@@ -123,13 +124,13 @@ export default class shipbattle extends Phaser.Scene{
         this.anims.create({
             key: "left",
             frames: this.anims.generateFrameNumbers("player", {start: 1, end: 2}),
-            frameRate: 10
+            frameRate: 6
         })
         
         this.anims.create({
             key: "right",
             frames: this.anims.generateFrameNumbers("player", {start: 1, end: 2}),
-            frameRate: 10
+            frameRate: 6
         })
         
         return player;
@@ -254,7 +255,7 @@ export default class shipbattle extends Phaser.Scene{
             if(this.enemySpeed < 255){
                 this.enemySpeed += 30
             }
-            if(this.speed < 175){
+            if(this.speed < 225){
                 this.speed += 25
             }
             if(this.fireRate > 82.5){
