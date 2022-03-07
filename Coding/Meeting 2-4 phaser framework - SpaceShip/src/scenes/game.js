@@ -39,7 +39,7 @@ export default class shipbattle extends Phaser.Scene{
         this.load.image("right-btn", "images/right-btn.png")
         this.load.image("shoot-btn", "images/shoot-btn.png")
         this.load.image("enemy", "images/enemy.png")
-        this.load.spritesheet("player", "images/ship.png", {frameWidth:66, frameheight:66})
+        this.load.spritesheet("player", "images/ship.png", {frameWidth:66, frameHeight:66})
         this.load.image("laser-1", "images/laser-1.png")
         this.load.image("laser-2", "images/laser-2.png")
         this.load.image("life-Restore", "images/PowerUp.png")
