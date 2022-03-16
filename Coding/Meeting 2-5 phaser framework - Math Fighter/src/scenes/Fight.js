@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+//eslint-disable no-undef 
 // @ts-nocheck
 /* eslint-disable no-unused-vars */
 import Phaser from "phaser";
@@ -29,7 +29,11 @@ export default class Fight extends Phaser.Scene{
         this.startGame = false
         this.questionText = undefined
         this.resultText = undefined
+        this.correctAnswer = undefined
+        this.playerAttack = false
+        this.enemyAttack = false
         this.numberArray = []
+        this.question = []
         this.number = 0
     }
     
@@ -65,12 +69,32 @@ export default class Fight extends Phaser.Scene{
         this.slash = this.physics.add.sprite(240, 60, "slash").setActive(false).setVisible(false).setGravityY(-500).setOffset(0, -10).setDepth(1).setCollideWorldBounds(true)
         this.physics.add.collider(this.player, tile)
         this.physics.add.collider(this.enemy, tile)
+        this.physics.add.overlap(this.player, this.slash, this.spriteHit, undefined, this);
+        this.physics.add.overlap(this.enemy, this.slash, this.spriteHit, undefined, this);
         
         let start_button = this.add.image(this.gameHalfWidth, this.gameHalfHeight + 181, "start-btn").setInteractive(); start_button.on("pointerdown", () => {this.gameStart(); start_button.destroy(); }, this)
     }
     
-    update(){
-
+    update(time){
+        if(this.correctAnswer == true && !this.playerAttack){
+            this.player.anims.play("player-attack", true)
+            this.time.delayedCall(500, () => {
+            this.createSlash(this.player.x + 60, this.player.y, 0, 600, false)
+            })
+        this.playerAttack = true
+        }
+        
+        if(this.correctAnswer == undefined){
+            this.player.anims.play("player-standby", true)
+            this.enemy.anims.play("enemy-standby", true)
+        }
+        if(this.correctAnswer == false && !this.enemyAttack){
+            this.enemy.anims.play("enemy-attack", true)
+            this.time.delayedCall(500, () => {
+            this.createSlash(this.enemy.x - 60, this.enemy.y, 2, -600, true)
+            })
+        this.enemyAttack = true
+        }
     }
     
     createAnimation(){
@@ -130,9 +154,11 @@ export default class Fight extends Phaser.Scene{
         this.startGame = true
         this.player.anims.play("player-standby", true)
         this.enemy.anims.play("enemy-standby", true)
-        this.resultText = this.add.text(this.gameHalfWidth, 400, "0", { fontSize : "32px", fill: "#000"})
-        this.questionText = this.add.text(this.gameHalfWidth, 200, "0", { fontSize : "32px", fill: "#000"})
+        this.resultText = this.add.text(this.gameHalfWidth, 200, "0", { fontSize : "32px", fill: "#000"})
+        this.questionText = this.add.text(this.gameHalfWidth, 75, "0", { fontSize : "32px", fill: "#000"})
         this.createButtons();
+        this.generateQuestion()
+        this.input.on("gameobjectdown", this.addNumber, this)
     }
 
     createButtons() {
@@ -184,19 +210,19 @@ export default class Fight extends Phaser.Scene{
     }
     
     addNumber(pointer, object, event) {
-    let value = object.getData("value")
+        let value = object.getData("value")
 
-    if (isNaN(value)) {
-        if(value == "del") {
-            this.numberArray.pop() 
-            if(this.numberArray.length < 1) {
-                this.numberArray[0] = 0 
+        if (isNaN(value)) {
+            if(value == "del") {
+                this.numberArray.pop() 
+                if(this.numberArray.length < 1) {
+                    this.numberArray[0] = 0 
+                }
             }
-        }
-        if(value == "ok") {
-            this.checkAnswer() 
-            this.numberArray = [] 
-            this.numberArray[0] = 0 
+            if(value == "ok") {
+                this.checkAnswer() 
+                this.numberArray = [] 
+                this.numberArray[0] = 0 
             }
         } else {
             if (this.numberArray.length == 1 &&
@@ -208,5 +234,83 @@ export default class Fight extends Phaser.Scene{
                 }
             }
         }
+        this.number = parseInt(this.numberArray.join(""))
+        this.resultText.setText(this.number)
+        const textHalfWidth = this.resultText.width * 0.5
+        this.resultText.setX(this.gameHalfWidth -
+        textHalfWidth)
+        event.stopPropagation()
+    }
+
+    getOperator(){
+        const operator = ["+", "-", "x", ":"]
+        return operator[Phaser.Math.Between(0,
+        operator.length - 1)]
+    }
+
+    generateQuestion() {
+        let numberA = Phaser.Math.Between(0,50)
+        let numberB = Phaser.Math.Between(0,50)
+        let operator = this.getOperator()
+        if (operator === "+") {
+            this.question[0] = `${numberA} + ${numberB}`
+            this.question[1] = numberA + numberB
+        }
+        if (operator === "-"){
+            if (numberB > numberA) {
+                this.question[0] = `${numberB} - ${numberA}`
+                this.question[1] = numberB - numberA
+            } else {
+                this.question[0] = `${numberA} - ${numberB}`
+                this.question[1] = numberA - numberB
+            }
+        }
+        if (operator === "x"){
+            this.question[0] = `${numberA} x ${numberB}`
+            this.question[1] = numberA * numberB
+        }
+        if (operator === ":"){
+            do {
+                numberA = Phaser.Math.Between(0, 50)
+                numberB = Phaser.Math.Between(0, 50)
+            }
+            while (!Number.isInteger(numberA/numberB))
+            this.question[0] = `${numberA} : ${numberB}`
+            this.question[1] = numberA / numberB
+        }
+        this.questionText.setText(this.question[0])
+        const textHalfWidth = this.questionText.width * 0.5
+        this.questionText.setX(this.gameHalfWidth -
+        textHalfWidth)
+    }
+
+    checkAnswer(){
+        if (this.number == this.question[1]){
+            this.correctAnswer = true
+        } else {
+            this.correctAnswer = false
+        }
+    }
+
+    createSlash(x, y, frame,velocity, flip){
+        this.slash.setPosition(x,y).setActive(true).setVisible(true).setFrame(frame).setVelocityX(velocity).setFlipX(flip)
+    }
+
+    spriteHit(slash, sprite){
+        slash.x = 0
+        slash.y = 0
+        slash.setActive(false)
+        slash.setVisible(false)
+        if(sprite.texture.key == "player") {
+            sprite.anims.play("player-hit", true)
+        } else {
+            sprite.anims.play("enemy-hit", true)
+        }
+        this.time.delayedCall(500, () => {
+        this.playerAttack = false
+        this.enemyAttack = false
+        this.correctAnswer = undefined
+        this.generateQuestion()
+        })
     }
 }
