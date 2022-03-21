@@ -3,10 +3,10 @@
 	"version": "1.0.0",
 	"description": "A template project for Phaser 3 using Parceljs",
 	"scripts": {
-		"build": "webpack --config webpack/prod.js ",
-		"start": "webpack-dev-server --config webpack/base.js --open",
-		"deploy": "gh-pages -d dist"
-	  },
+		"start": "parcel src/index.html -p 8000",
+		"build": "parcel build src/index.html --out-dir dist",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
 	"author": "supertommy",
 	"license": "MIT",
 	"repository": {
