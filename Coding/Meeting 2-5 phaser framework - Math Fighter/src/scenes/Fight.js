@@ -2,6 +2,7 @@
 // @ts-nocheck
 /* eslint-disable no-unused-vars */
 import Phaser from "phaser";
+import ScoreLabel from "../ui/ScoreLabel";
 
 export default class Fight extends Phaser.Scene{
     constructor(){
@@ -313,4 +314,11 @@ export default class Fight extends Phaser.Scene{
         this.generateQuestion()
         })
     }
+
+    createScoreLabel(x, y, score){
+        const style = { fontSize: "24px", fill: "#000",fontStyle: "bold" }
+        const label = new ScoreLabel(this, x, y, score, style).setDepth(1)
+        this.add.existing(label)
+        return label
+}
 }
