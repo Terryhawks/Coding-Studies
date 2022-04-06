@@ -27,15 +27,19 @@ export default class Fight extends Phaser.Scene{
         this.button0 = undefined
         this.buttonDel = undefined
         this.buttonOk = undefined
-        this.startGame = false
+        this.timerLabel = undefined
         this.questionText = undefined
         this.resultText = undefined
         this.correctAnswer = undefined
+        this.timedEvent = undefined
         this.playerAttack = false
         this.enemyAttack = false
+        this.startGame = false
+        this.number = 0
+        this.countdownTimer = 60
         this.numberArray = []
         this.question = []
-        this.number = 0
+        this.scoreLabel = 0
     }
     
     preload(){
@@ -72,8 +76,11 @@ export default class Fight extends Phaser.Scene{
         this.physics.add.collider(this.enemy, tile)
         this.physics.add.overlap(this.player, this.slash, this.spriteHit, undefined, this);
         this.physics.add.overlap(this.enemy, this.slash, this.spriteHit, undefined, this);
+
+        this.scoreLabel = this.createScoreLabel(26,16, 0)
         
         let start_button = this.add.image(this.gameHalfWidth, this.gameHalfHeight + 181, "start-btn").setInteractive(); start_button.on("pointerdown", () => {this.gameStart(); start_button.destroy(); }, this)
+        this.timerLabel = this.add.text(this.gameHalfWidth, 16,null).setDepth(5)
     }
     
     update(time){
@@ -95,6 +102,14 @@ export default class Fight extends Phaser.Scene{
             this.createSlash(this.enemy.x - 60, this.enemy.y, 2, -600, true)
             })
         this.enemyAttack = true
+        }
+        if(this.startGame == true){
+            this.timerLabel.setStyle({
+            fontSize: "24px",
+            fill : "#000",
+            fontStyle: "bold",
+            align : "center"
+            }). setText(this.countdownTimer)
         }
     }
     
@@ -160,6 +175,12 @@ export default class Fight extends Phaser.Scene{
         this.createButtons();
         this.generateQuestion()
         this.input.on("gameobjectdown", this.addNumber, this)
+        this.timedEvent = this.time.addEvent({
+            delay: 1000,
+            callback: this.gameOver,
+            callbackScope: this,
+            loop: true
+        })
     }
 
     createButtons() {
@@ -304,8 +325,12 @@ export default class Fight extends Phaser.Scene{
         slash.setVisible(false)
         if(sprite.texture.key == "player") {
             sprite.anims.play("player-hit", true)
+            if(this.scoreLabel.getScore() > 0){
+                this.scoreLabel.add(-50)
+            }
         } else {
             sprite.anims.play("enemy-hit", true)
+            this.scoreLabel.add(50)
         }
         this.time.delayedCall(500, () => {
         this.playerAttack = false
@@ -320,5 +345,13 @@ export default class Fight extends Phaser.Scene{
         const label = new ScoreLabel(this, x, y, score, style).setDepth(1)
         this.add.existing(label)
         return label
-}
+    }
+
+    gameOver(){
+        this.countdownTimer -= 1
+        if (this.countdownTimer < 0) {
+        this.scene.start("game-over-scene", {score:
+        this.scoreLabel.getScore() })
+        }
+    }
 }
